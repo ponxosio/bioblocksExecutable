@@ -18,7 +18,7 @@ CommandLineParametersObj CommandLineParametersObj::parseCommandLineArguments(con
     std::shared_ptr<CommandSender> command;
     if (parser.isSet("simulate_execute")) {
         std::string serialPort = parser.value("port").toStdString();
-        std::string baudrateStr = parser.value("baudRate").toStdString();
+        std::string baudrateStr = parser.value("baud_rate").toStdString();
 
         qint32 baudRate = std::atoi(baudrateStr.c_str());
         command = std::make_shared<SerialSender>(serialPort, baudRate);
@@ -62,7 +62,7 @@ void CommandLineParametersObj::fillParserObj(QCommandLineParser & parser) {
 
     QCommandLineOption baudRateOption("baud_rate",
                                       QCoreApplication::translate("main", "only use it with the serial command, specifies the baud rate of the connection"),
-                                      "baudRate");
+                                      "baud_rate");
     parser.addOption(baudRateOption);
 
     QCommandLineOption portOption("port",
