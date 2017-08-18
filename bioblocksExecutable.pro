@@ -15,6 +15,7 @@ CONFIG(release, debug|release) {
 }
 
 QT += core
+QT += network
 QT -= gui
 
 CONFIG += c++11
@@ -27,7 +28,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     commandlineparametersobj.cpp \
+<<<<<<< HEAD
     qtbioblockexecutable.cpp
+=======
+    qtbioblockexecutable.cpp \
+    killsignalthread.cpp
+>>>>>>> 71849cd9ba2e8cd538941a138541871c0e52f919
 
 debug {
     QMAKE_POST_LINK=X:\bioblocksExecutable\bioblocksExecutable\copyDLL.bat $$shell_path($$OUT_PWD/debug) debug
@@ -115,4 +121,9 @@ LIBS += -L$$quote(C:\Python27\libs)
 
 HEADERS += \
     commandlineparametersobj.h \
+<<<<<<< HEAD
     qtbioblockexecutable.h
+=======
+    qtbioblockexecutable.h \
+    killsignalthread.h
+>>>>>>> 71849cd9ba2e8cd538941a138541871c0e52f919
