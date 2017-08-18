@@ -6,11 +6,9 @@
 #include <pythonPlugins/environment/PythonEnvironment.h>
 //
 
-#include <iostream>
+#include <signal.h>
 
-#include <QCoreApplication>
-#include <QCommandLineParser>
-#include <QCommandLineOption>
+#include <QObject>
 
 #include <bioblocksExecution/usercommunications/consoleusercommunications.h>
 #include <bioblocksExecution/bioblocksexecution.h>
@@ -26,44 +24,86 @@
 
 #include "commandlineparametersobj.h"
 
+ std::shared_ptr<CommandSender> command = NULL;
+ BioblocksExecution* execution = NULL;
+
+ void handle_eptr(std::exception_ptr eptr) // passing by value is ok
+ {
+     try {
+         if (eptr) {
+             std::rethrow_exception(eptr);
+         }
+     } catch(const std::exception& e) {
+         std::cerr << "Exeption occurred: " << e.what() << std::endl;
+     }
+ }
+
+ void cleanUp() {
+     std::cout << "cleaning up...";
+
+     if (execution != NULL) {
+         execution->stopExecution();
+         delete execution;
+     }
+
+     if (command != NULL) {
+         command->disconnect();
+     }
+
+     PythonEnvironment::GetInstance()->finishEnvironment();
+     PrologExecutor::destoryEngine();
+
+     std::cout << "done!" << std::endl;
+ }
+
+void SignalHandler(int signal) {
+    if(signal == SIGINT || signal == SIGTERM) {
+        std::cout << "kill signal arrived" << std::endl;
+        cleanUp();
+        exit(0);
+    }
+}
+
 int main(int argc, char *argv[])
 {
-    std::cout << "Initializing System..."<< std::endl;
+    std::cout << "starting...";
+    QCoreApplication app(argc, argv);
+    std::cout << "done!" << std::endl;
 
-    QCoreApplication a(argc, argv);
-    QCoreApplication::setApplicationVersion("0.1");
-
-    std::shared_ptr<CommandSender> command = NULL;
+    std::exception_ptr eptr;
     try {
-        CommandLineParametersObj parameters = CommandLineParametersObj::parseCommandLineArguments(a);
+        std::cout << "reading params...";
+        CommandLineParametersObj parameters = CommandLineParametersObj::parseCommandLineArguments(app);
         command = parameters.getCommand();
 
         PluginFileLoader::setPluginDir(parameters.getPluginFolderPath());
+        std::cout << "done!" << std::endl;
 
+        std::cout << "initilaizing environment...";
         PythonEnvironment::GetInstance()->initEnvironment(parameters.getPluginBaseFolderPath());
         PrologExecutor::createEngine(QCoreApplication::applicationName().toStdString());
 
+        signal(SIGINT, SignalHandler);
+        signal(SIGTERM, SignalHandler);
+
         command->connect();
+        std::cout << "done!" << std::endl;
 
         std::shared_ptr<PythonPluginAbstractFactory> pythonPlugins = std::make_shared<PythonPluginAbstractFactory>(command);
         std::shared_ptr<UserCommunicationInterface> userCom = std::make_shared<ConsoleUserCommunications>();
-        BioblocksExecution execution(pythonPlugins, userCom);
+        execution = new BioblocksExecution(pythonPlugins, userCom);
 
-        execution.executeNewProtocol(parameters.getProtocolFilePath(), parameters.getMachineFilePath(), parameters.getTimeSlice());
+        std::cout << "executing:" << std::endl;
+        execution->executeNewProtocol(parameters.getProtocolFilePath(), parameters.getMachineFilePath(), parameters.getTimeSlice());
 
-        PythonEnvironment::GetInstance()->finishEnvironment();
-        PrologExecutor::destoryEngine();
-        command->disconnect();
-
-        return 0;
     } catch (std::exception & e) {
         std::cerr << "Exeption occurred: " << e.what() << std::endl;
-
-        PythonEnvironment::GetInstance()->finishEnvironment();
-        PrologExecutor::destoryEngine();
-        if (command != NULL) {
-            command->disconnect();
-        }
-        return -1;
+    } catch(...) {
+        eptr = std::current_exception();
     }
+
+    handle_eptr(eptr);
+
+    cleanUp();
+    exit(0);
 }
