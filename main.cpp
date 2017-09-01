@@ -9,11 +9,8 @@
 #include <signal.h>
 
 #include <QObject>
-<<<<<<< HEAD
-=======
 #include <QTimer>
 #include <QLocalServer>
->>>>>>> 71849cd9ba2e8cd538941a138541871c0e52f919
 
 #include <bioblocksExecution/usercommunications/consoleusercommunications.h>
 #include <bioblocksExecution/bioblocksexecution.h>
@@ -31,130 +28,8 @@
 #include "qtbioblockexecutable.h"
 #include "killsignalthread.h"
 
- std::shared_ptr<CommandSender> command = NULL;
- BioblocksExecution* execution = NULL;
-
- void handle_eptr(std::exception_ptr eptr) // passing by value is ok
- {
-     try {
-         if (eptr) {
-             std::rethrow_exception(eptr);
-         }
-     } catch(const std::exception& e) {
-         std::cerr << "Exeption occurred: " << e.what() << std::endl;
-     }
- }
-
- void cleanUp() {
-     std::cout << "cleaning up...";
-
-     if (execution != NULL) {
-         execution->stopExecution();
-         delete execution;
-     }
-
-     if (command != NULL) {
-         command->disconnect();
-     }
-
-     PythonEnvironment::GetInstance()->finishEnvironment();
-     PrologExecutor::destoryEngine();
-
-     std::cout << "done!" << std::endl;
- }
-
-void SignalHandler(int signal) {
-    if(signal == SIGINT || signal == SIGTERM) {
-        std::cout << "kill signal arrived" << std::endl;
-        cleanUp();
-        exit(0);
-    }
-}
-
- std::shared_ptr<CommandSender> command = NULL;
- BioblocksExecution* execution = NULL;
-
- void handle_eptr(std::exception_ptr eptr) // passing by value is ok
- {
-     try {
-         if (eptr) {
-             std::rethrow_exception(eptr);
-         }
-     } catch(const std::exception& e) {
-         std::cerr << "Exeption occurred: " << e.what() << std::endl;
-     }
- }
-
- void cleanUp() {
-     std::cout << "cleaning up...";
-
-     if (execution != NULL) {
-         execution->stopExecution();
-         delete execution;
-     }
-
-     if (command != NULL) {
-         command->disconnect();
-     }
-
-     PythonEnvironment::GetInstance()->finishEnvironment();
-     PrologExecutor::destoryEngine();
-
-     std::cout << "done!" << std::endl;
- }
-
-void SignalHandler(int signal) {
-    if(signal == SIGINT || signal == SIGTERM) {
-        std::cout << "kill signal arrived" << std::endl;
-        cleanUp();
-        exit(0);
-    }
-}
-
 int main(int argc, char *argv[])
 {
-<<<<<<< HEAD
-    std::cout << "starting...";
-    QCoreApplication app(argc, argv);
-    std::cout << "done!" << std::endl;
-
-    std::exception_ptr eptr;
-    try {
-        std::cout << "reading params...";
-        CommandLineParametersObj parameters = CommandLineParametersObj::parseCommandLineArguments(app);
-        command = parameters.getCommand();
-
-        PluginFileLoader::setPluginDir(parameters.getPluginFolderPath());
-        std::cout << "done!" << std::endl;
-
-        std::cout << "initilaizing environment...";
-        PythonEnvironment::GetInstance()->initEnvironment(parameters.getPluginBaseFolderPath());
-        PrologExecutor::createEngine(QCoreApplication::applicationName().toStdString());
-
-        signal(SIGINT, SignalHandler);
-        signal(SIGTERM, SignalHandler);
-
-        command->connect();
-        std::cout << "done!" << std::endl;
-
-        std::shared_ptr<PythonPluginAbstractFactory> pythonPlugins = std::make_shared<PythonPluginAbstractFactory>(command);
-        std::shared_ptr<UserCommunicationInterface> userCom = std::make_shared<ConsoleUserCommunications>();
-        execution = new BioblocksExecution(pythonPlugins, userCom);
-
-        std::cout << "executing:" << std::endl;
-        execution->executeNewProtocol(parameters.getProtocolFilePath(), parameters.getMachineFilePath(), parameters.getTimeSlice());
-
-    } catch (std::exception & e) {
-        std::cerr << "Exeption occurred: " << e.what() << std::endl;
-    } catch(...) {
-        eptr = std::current_exception();
-    }
-
-    handle_eptr(eptr);
-
-    cleanUp();
-    exit(0);
-=======
     QCoreApplication app(argc, argv);
 
     // create the main class
@@ -187,5 +62,4 @@ int main(int argc, char *argv[])
     // 10ms it will start the execution in the MainClass.run routine;
     QTimer::singleShot(10, &myMain, SLOT(run()));
     return app.exec();
->>>>>>> 71849cd9ba2e8cd538941a138541871c0e52f919
 }

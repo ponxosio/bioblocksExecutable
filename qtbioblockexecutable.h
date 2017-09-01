@@ -9,16 +9,10 @@
 #include <pythonPlugins/environment/PythonEnvironment.h>
 //
 
-<<<<<<< HEAD
-#include <signal.h>
-
-#include <QObject>
-=======
 #include <QObject>
 #include <QDataStream>
 #include <QLocalSocket>
 #include <QLocalServer>
->>>>>>> 71849cd9ba2e8cd538941a138541871c0e52f919
 
 #include <bioblocksExecution/usercommunications/consoleusercommunications.h>
 #include <bioblocksExecution/bioblocksexecution.h>
@@ -33,10 +27,7 @@
 #include <utils/utilsjson.h>
 
 #include "commandlineparametersobj.h"
-<<<<<<< HEAD
-=======
 #include "killsignalthread.h"
->>>>>>> 71849cd9ba2e8cd538941a138541871c0e52f919
 
 class QtBioblockExecutable : public QObject
 {
@@ -46,20 +37,12 @@ private:
     QCoreApplication* app;
     BioblocksExecution* execution;
     std::shared_ptr<CommandSender> command;
-<<<<<<< HEAD
-    _In_opt_ _crt_signal_t _Function;
-
-public:
-    explicit QtBioblockExecutable(_In_opt_ _crt_signal_t _Function, QObject *parent = 0);
-    ~QtBioblockExecutable();
-=======
     KillSignalThread* executionThread;
     QLocalServer* exitServer;
 
 public:
     QtBioblockExecutable(QLocalServer* exitServer, QObject *parent = 0) throw(std::runtime_error);
     virtual ~QtBioblockExecutable();
->>>>>>> 71849cd9ba2e8cd538941a138541871c0e52f919
 
     /////////////////////////////////////////////////////////////
     /// Call this to quit application
@@ -88,11 +71,8 @@ public slots:
     /// slot that get signal when that application is about to quit
     /////////////////////////////////////////////////////////////
     void aboutToQuitApp();
-<<<<<<< HEAD
-=======
 
     void processTerminationSignal();
->>>>>>> 71849cd9ba2e8cd538941a138541871c0e52f919
 };
 
 #endif // QTBIOBLOCKEXECUTABLE_H
