@@ -73,6 +73,8 @@ public slots:
     void aboutToQuitApp();
 
     void processTerminationSignal();
+
+    void terminate();
 };
 
 #endif // QTBIOBLOCKEXECUTABLE_H

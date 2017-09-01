@@ -27,14 +27,15 @@ void QtBioblockExecutable::quit() {
 }
 
 void QtBioblockExecutable::cleanUp() {
-    std::cout << "about to quit..." << std::endl;
-
-    if (executionThread != NULL) {
-        executionThread->quit();
-    }
+    std::cout << "about to quit...";
 
     if (execution != NULL) {
         execution->stopExecution();
+    }
+
+    if (executionThread != NULL) {
+        //executionThread->quit();
+        executionThread->wait(30000);
     }
 
     PythonEnvironment::GetInstance()->finishEnvironment();
@@ -43,6 +44,7 @@ void QtBioblockExecutable::cleanUp() {
     if (command != NULL) {
         command->disconnect();
     }
+    std::cout << "done!" << std::endl;
 }
 
 void QtBioblockExecutable::run() {
@@ -55,6 +57,7 @@ void QtBioblockExecutable::run() {
 
         std::cout << "done!" << std::endl;
 
+        std::cout << "opening communications with the machine...";
         command->connect();
         std::cout << "done!" << std::endl;
 
@@ -68,7 +71,7 @@ void QtBioblockExecutable::run() {
                                                parameters.getPluginBaseFolderPath(),
                                                parameters.getTimeSlice());
 
-        connect(executionThread, SIGNAL(ended()), this, SLOT(aboutToQuitApp()));
+        connect(executionThread, SIGNAL(ended()), this, SLOT(terminate()));
 
         executionThread->start();
     } catch (std::exception & e) {
@@ -100,5 +103,9 @@ void QtBioblockExecutable::processTerminationSignal() {
     clientConnection->flush();
     clientConnection->disconnectFromServer();
 
+    quit();
+}
+
+void QtBioblockExecutable::terminate() {
     quit();
 }
