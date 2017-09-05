@@ -22,11 +22,17 @@ CommandLineParametersObj CommandLineParametersObj::parseCommandLineArguments(con
 
         qint32 baudRate = std::atoi(baudrateStr.c_str());
         command = std::make_shared<SerialSender>(serialPort, baudRate);
+
+        obj.timestampManager = NULL;
     } else {
         std::string outFile = parser.value("out_file").toStdString();
         std::string dataFile = parser.value("data_file").toStdString();
 
-        command = std::make_shared<FileSender>(outFile, dataFile);
+        obj.timestampManager = NULL;
+        if (parser.isSet("simulate_time")) {
+            obj.timestampManager = std::make_shared<TimeStampSimulator>();
+        }
+        command = std::make_shared<FileSender>(outFile, dataFile, obj.timestampManager);
     }
     obj.command = command;
     return obj;
@@ -59,6 +65,10 @@ void CommandLineParametersObj::fillParserObj(QCommandLineParser & parser) {
     QCommandLineOption serialCommandOption("simulate_execute",
                                            QCoreApplication::translate("main", "execute the protocol using the serial command to communicate with the machine, add --port and --baudrates. If not simulates the protocols add --out_file and --data_file"));
     parser.addOption(serialCommandOption);
+
+    QCommandLineOption timeCommandOption("simulate_time",
+                                         QCoreApplication::translate("main", "only if use when simulating, if this flag is enabled the time is simulated instead of waiting for the real time to pass."));
+    parser.addOption(timeCommandOption);
 
     QCommandLineOption baudRateOption("baud_rate",
                                       QCoreApplication::translate("main", "only use it with the serial command, specifies the baud rate of the connection"),

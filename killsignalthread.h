@@ -16,6 +16,7 @@
 
 #include <bioblocksExecution/bioblocksexecution.h>
 #include <constraintengine/prologexecutor.h>
+#include <utils/timestampsimulator.h>
 
 class KillSignalThread : public QThread
 {
@@ -27,7 +28,9 @@ public:
                      const std::string & machineJSONFile,
                      const std::string & pluginBaseFolder,
                      units::Time timeSlice,
+                     std::shared_ptr<TimeStampSimulator> timestampSimulator = NULL,
                      QObject* parent=0);
+
     virtual ~KillSignalThread();
 
 signals:
@@ -42,6 +45,8 @@ private:
     std::string machineJSONFile;
     std::string pluginBaseFolder;
     units::Time timeSlice;
+
+    std::shared_ptr<TimeStampSimulator> timestampSimulator;
 };
 
 #endif // KILLSIGNALTHREAD_H

@@ -6,11 +6,14 @@ KillSignalThread::KillSignalThread(
         const std::string & machineJSONFile,
         const std::string & pluginBaseFolder,
         units::Time timeSlice,
+        std::shared_ptr<TimeStampSimulator> timestampSimulator,
         QObject* parent) :
     QThread(parent), protocolJSONFile(protocolJSONFile), machineJSONFile(machineJSONFile), pluginBaseFolder(pluginBaseFolder)
 {
     this->executable = executable;
     this->timeSlice = timeSlice;
+
+    this->timestampSimulator = timestampSimulator;
 }
 
 KillSignalThread::~KillSignalThread() {
@@ -28,7 +31,11 @@ void KillSignalThread::run() {
 
         std::cout << "executing in thread:" << std::endl;
 
-        executable->executeNewProtocol(protocolJSONFile, machineJSONFile, timeSlice);
+        if (timestampSimulator == NULL) {
+            executable->executeNewProtocol(protocolJSONFile, machineJSONFile, timeSlice);
+        } else {
+            executable->executeNewProtocolSimulateTime(protocolJSONFile, machineJSONFile, timeSlice, timestampSimulator);
+        }
 
         std::cout << "end execution!" << std::endl;
         emit ended();

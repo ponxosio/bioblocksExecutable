@@ -69,7 +69,8 @@ void QtBioblockExecutable::run() {
                                                parameters.getProtocolFilePath(),
                                                parameters.getMachineFilePath(),
                                                parameters.getPluginBaseFolderPath(),
-                                               parameters.getTimeSlice());
+                                               parameters.getTimeSlice(),
+                                               parameters.getSimulateTimestamp());
 
         connect(executionThread, SIGNAL(ended()), this, SLOT(terminate()));
 

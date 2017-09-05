@@ -14,6 +14,7 @@
 
 #include <utils/units.h>
 #include <utils/utilsjson.h>
+#include <utils/timestampsimulator.h>
 
 class CommandLineParametersObj
 {
@@ -46,6 +47,10 @@ public:
         return command;
     }
 
+    inline std::shared_ptr<TimeStampSimulator> getSimulateTimestamp() const {
+        return timestampManager;
+    }
+
 protected:
     static void fillParserObj(QCommandLineParser & parser);
 
@@ -58,6 +63,8 @@ protected:
     units::Time timeSlice;
 
     std::shared_ptr<CommandSender> command;
+    std::shared_ptr<TimeStampSimulator> timestampManager;
+    bool simulateTime;
 };
 
 #endif // COMMANDLINEPARAMETERSOBJ_H
